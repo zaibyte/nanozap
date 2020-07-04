@@ -21,13 +21,10 @@
 package zapcore
 
 import (
-	"fmt"
+	"github.com/templexxx/nanozap/internal/bufferpool"
+	"os"
 	"strings"
 	"sync"
-	"time"
-
-	"github.com/templexxx/nanozap/internal/bufferpool"
-	"github.com/templexxx/nanozap/internal/exit"
 
 	"go.uber.org/multierr"
 )
@@ -169,7 +166,6 @@ const (
 // NOT be retained after calling their Write method.
 type CheckedEntry struct {
 	Entry
-	ErrorOutput WriteSyncer
 	dirty       bool // best-effort detection of pool misuse
 	should      CheckWriteAction
 	cores       []Core
@@ -177,7 +173,6 @@ type CheckedEntry struct {
 
 func (ce *CheckedEntry) reset() {
 	ce.Entry = Entry{}
-	ce.ErrorOutput = nil
 	ce.dirty = false
 	ce.should = WriteThenNoop
 	for i := range ce.cores {
@@ -196,14 +191,6 @@ func (ce *CheckedEntry) Write(fields ...Field) {
 	}
 
 	if ce.dirty {
-		if ce.ErrorOutput != nil {
-			// Make a best effort to detect unsafe re-use of this CheckedEntry.
-			// If the entry is dirty, log an internal error; because the
-			// CheckedEntry is being used after it was returned to the pool,
-			// the message may be an amalgamation from multiple call sites.
-			fmt.Fprintf(ce.ErrorOutput, "%v Unsafe CheckedEntry re-use near Entry %+v.\n", time.Now(), ce.Entry)
-			ce.ErrorOutput.Sync()
-		}
 		return
 	}
 	ce.dirty = true
@@ -211,12 +198,6 @@ func (ce *CheckedEntry) Write(fields ...Field) {
 	var err error
 	for i := range ce.cores {
 		err = multierr.Append(err, ce.cores[i].Write(ce.Entry, fields))
-	}
-	if ce.ErrorOutput != nil {
-		if err != nil {
-			fmt.Fprintf(ce.ErrorOutput, "%v write error: %v\n", time.Now(), err)
-			ce.ErrorOutput.Sync()
-		}
 	}
 
 	should, msg := ce.should, ce.Message
@@ -226,7 +207,7 @@ func (ce *CheckedEntry) Write(fields ...Field) {
 	case WriteThenPanic:
 		panic(msg)
 	case WriteThenFatal:
-		exit.Exit()
+		os.Exit(1)
 	}
 }
 
