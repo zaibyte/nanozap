@@ -17,4 +17,8 @@ Nanozap is a nanosecond scale logging system for Go based on uber-go/zap.
 
 8. remove fields support, only message
 
-9. no options no logger clone
+9. no options (no logger clone too)
+
+10. remove DPanicLevel
+
+11. no logger name

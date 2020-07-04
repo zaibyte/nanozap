@@ -39,7 +39,6 @@ func TestLevelEnablerFunc(t *testing.T) {
 		{InfoLevel, true},
 		{WarnLevel, false},
 		{ErrorLevel, false},
-		{DPanicLevel, false},
 		{PanicLevel, false},
 		{FatalLevel, false},
 	}
@@ -86,7 +85,6 @@ func TestAtomicLevelText(t *testing.T) {
 		{"", InfoLevel, false},
 		{"warn", WarnLevel, false},
 		{"error", ErrorLevel, false},
-		{"dpanic", DPanicLevel, false},
 		{"panic", PanicLevel, false},
 		{"fatal", FatalLevel, false},
 		{"foobar", InfoLevel, true},

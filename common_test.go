@@ -24,9 +24,7 @@ import (
 	"sync"
 )
 
-func opts(opts ...Option) []Option {
-	return opts
-}
+
 
 func runConcurrently(goroutines, iterations int, wg *sync.WaitGroup, f func()) {
 	wg.Add(goroutines)

@@ -23,6 +23,7 @@ package nanozap
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 	"unsafe"
@@ -34,8 +35,6 @@ import (
 // For nanozap, the random order only happens when there is a flood,
 // and random order logs won't cause serious issues.
 type Logger struct {
-	name string
-
 	core zapcore.Core
 
 	ring *Ring
@@ -45,19 +44,11 @@ type Logger struct {
 	loopWg     sync.WaitGroup
 }
 
-// New constructs a new Logger from the provided zapcore.Core and Options. If
-// the passed zapcore.Core is nil, it falls back to using a no-op
-// implementation.
-//
-// This is the most flexible way to construct a Logger, but also the most
-// verbose. For typical use cases, the highly-opinionated presets
-// (NewProduction, NewDevelopment, and NewExample) or the Config struct are
-// more convenient.
-//
-// For sample code, see the package-level AdvancedConfiguration example.
+// New constructs a new Logger from the provided zapcore.Core. If
+// the passed zapcore.Core is nil, it panic.
 func New(core zapcore.Core) *Logger {
 	if core == nil {
-		return nil
+		panic("empty core")
 	}
 	log := &Logger{
 		core: core,
@@ -72,13 +63,6 @@ func New(core zapcore.Core) *Logger {
 // Without guarantee anything except exiting loop.
 func (log *Logger) Close() {
 	log.stopLoop()
-}
-
-// Check returns a CheckedEntry if logging a message at the specified level
-// is enabled. It's a completely optional optimization; in high-performance
-// applications, Check can help avoid allocating a slice to hold fields.
-func (log *Logger) Check(lvl zapcore.Level, msg string) *zapcore.CheckedEntry {
-	return log.check(lvl, msg)
 }
 
 func (log *Logger) startLoop() {
@@ -118,10 +102,11 @@ func (log *Logger) writeLoop() {
 	}
 }
 
-// Debug logs a message at DebugLevel. The message includes any fields passed
-// at the log site, as well as any fields accumulated on the logger.
-func (log *Logger) Debug(msg string, fields ...Field) {
-	if !log.core.Enabled(DebugLevel) { // Fast check.
+// Debug logs a message at DebugLevel.
+func (log *Logger) Debug(msg string) {
+	// Fast check. Debug level is a special case, because we usually use it in developing,
+	// then close it in production env. There maybe lots of Enabled test, return it early.
+	if !log.core.Enabled(DebugLevel) {
 		return
 	}
 
@@ -132,9 +117,22 @@ func (log *Logger) Debug(msg string, fields ...Field) {
 	log.ring.Push(unsafe.Pointer(lb))
 }
 
-// Info logs a message at InfoLevel. The message includes any fields passed
-// at the log site, as well as any fields accumulated on the logger.
-func (log *Logger) Info(msg string, fields ...Field) {
+func (log *Logger) Debugf(format string, args ...interface{}) {
+	// Fast check. Debug level is a special case, because we usually use it in developing,
+	// then close it in production env. There maybe lots of Enabled test, return it early.
+	if !log.core.Enabled(DebugLevel) {
+		return
+	}
+
+	lb := getLogBody()
+	lb.msg = fmt.Sprintf(format, args...)
+	lb.lvl = DebugLevel
+
+	log.ring.Push(unsafe.Pointer(lb))
+}
+
+// Info logs a message at InfoLevel.
+func (log *Logger) Info(msg string) {
 
 	lb := getLogBody()
 	lb.msg = msg
@@ -143,9 +141,13 @@ func (log *Logger) Info(msg string, fields ...Field) {
 	log.ring.Push(unsafe.Pointer(lb))
 }
 
-// Warn logs a message at WarnLevel. The message includes any fields passed
-// at the log site, as well as any fields accumulated on the logger.
-func (log *Logger) Warn(msg string, fields ...Field) {
+func (log *Logger) Infof(format string, args ...interface{}) {
+
+	log.Info(fmt.Sprintf(format, args...))
+}
+
+// Warn logs a message at WarnLevel.
+func (log *Logger) Warn(msg string) {
 	lb := getLogBody()
 	lb.msg = msg
 	lb.lvl = WarnLevel
@@ -153,9 +155,13 @@ func (log *Logger) Warn(msg string, fields ...Field) {
 	log.ring.Push(unsafe.Pointer(lb))
 }
 
-// Error logs a message at ErrorLevel. The message includes any fields passed
-// at the log site, as well as any fields accumulated on the logger.
-func (log *Logger) Error(msg string, fields ...Field) {
+func (log *Logger) Warnf(format string, args ...interface{}) {
+
+	log.Warn(fmt.Sprintf(format, args...))
+}
+
+// Error logs a message at ErrorLevel.
+func (log *Logger) Error(msg string) {
 	lb := getLogBody()
 	lb.msg = msg
 	lb.lvl = ErrorLevel
@@ -163,11 +169,15 @@ func (log *Logger) Error(msg string, fields ...Field) {
 	log.ring.Push(unsafe.Pointer(lb))
 }
 
-// Panic logs a message at PanicLevel. The message includes any fields passed
-// at the log site, as well as any fields accumulated on the logger.
+func (log *Logger) Errorf(format string, args ...interface{}) {
+
+	log.Error(fmt.Sprintf(format, args...))
+}
+
+// Panic logs a message at PanicLevel. T
 //
 // The logger then panics, even if logging at PanicLevel is disabled.
-func (log *Logger) Panic(msg string, fields ...Field) {
+func (log *Logger) Panic(msg string) {
 	lb := getLogBody()
 	lb.msg = msg
 	lb.lvl = PanicLevel
@@ -175,17 +185,26 @@ func (log *Logger) Panic(msg string, fields ...Field) {
 	log.ring.Push(unsafe.Pointer(lb))
 }
 
-// Fatal logs a message at FatalLevel. The message includes any fields passed
-// at the log site, as well as any fields accumulated on the logger.
+func (log *Logger) Panicf(format string, args ...interface{}) {
+
+	log.Panic(fmt.Sprintf(format, args...))
+}
+
+// Fatal logs a message at FatalLevel.
 //
 // The logger then calls os.Exit(1), even if logging at FatalLevel is
 // disabled.
-func (log *Logger) Fatal(msg string, fields ...Field) {
+func (log *Logger) Fatal(msg string) {
 	lb := getLogBody()
 	lb.msg = msg
 	lb.lvl = FatalLevel
 
 	log.ring.Push(unsafe.Pointer(lb))
+}
+
+func (log *Logger) Fatalf(format string, args ...interface{}) {
+
+	log.Fatal(fmt.Sprintf(format, args...))
 }
 
 // Sync calls the underlying Core's Sync method, flushing any buffered log
@@ -204,7 +223,6 @@ func (log *Logger) check(lvl zapcore.Level, msg string) *zapcore.CheckedEntry {
 	// Create basic checked entry thru the core; this will be non-nil if the
 	// log message will actually be written somewhere.
 	ent := zapcore.Entry{
-		LoggerName: log.name,
 		Time:       tsc.UnixNano(),
 		Level:      lvl,
 		Message:    msg,

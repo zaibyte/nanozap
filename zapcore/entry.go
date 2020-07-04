@@ -143,7 +143,6 @@ func (ec EntryCaller) TrimmedPath() string {
 type Entry struct {
 	Level      Level
 	Time       int64
-	LoggerName string
 	Message    string
 	ReqID      string
 }
