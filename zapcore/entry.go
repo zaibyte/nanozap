@@ -21,9 +21,7 @@
 package zapcore
 
 import (
-	"github.com/templexxx/nanozap/internal/bufferpool"
 	"os"
-	"strings"
 	"sync"
 
 	"go.uber.org/multierr"
@@ -49,86 +47,6 @@ func putCheckedEntry(ce *CheckedEntry) {
 		return
 	}
 	_cePool.Put(ce)
-}
-
-// NewEntryCaller makes an EntryCaller from the return signature of
-// runtime.Caller.
-func NewEntryCaller(pc uintptr, file string, line int, ok bool) EntryCaller {
-	if !ok {
-		return EntryCaller{}
-	}
-	return EntryCaller{
-		PC:      pc,
-		File:    file,
-		Line:    line,
-		Defined: true,
-	}
-}
-
-// EntryCaller represents the caller of a logging function.
-type EntryCaller struct {
-	Defined bool
-	PC      uintptr
-	File    string
-	Line    int
-}
-
-// String returns the full path and line number of the caller.
-func (ec EntryCaller) String() string {
-	return ec.FullPath()
-}
-
-// FullPath returns a /full/path/to/package/file:line description of the
-// caller.
-func (ec EntryCaller) FullPath() string {
-	if !ec.Defined {
-		return "undefined"
-	}
-	buf := bufferpool.Get()
-	buf.AppendString(ec.File)
-	buf.AppendByte(':')
-	buf.AppendInt(int64(ec.Line))
-	caller := buf.String()
-	buf.Free()
-	return caller
-}
-
-// TrimmedPath returns a package/file:line description of the caller,
-// preserving only the leaf directory name and file name.
-func (ec EntryCaller) TrimmedPath() string {
-	if !ec.Defined {
-		return "undefined"
-	}
-	// nb. To make sure we trim the path correctly on Windows too, we
-	// counter-intuitively need to use '/' and *not* os.PathSeparator here,
-	// because the path given originates from Go stdlib, specifically
-	// runtime.Caller() which (as of Mar/17) returns forward slashes even on
-	// Windows.
-	//
-	// See https://github.com/golang/go/issues/3335
-	// and https://github.com/golang/go/issues/18151
-	//
-	// for discussion on the issue on Go side.
-	//
-	// Find the last separator.
-	//
-	idx := strings.LastIndexByte(ec.File, '/')
-	if idx == -1 {
-		return ec.FullPath()
-	}
-	// Find the penultimate separator.
-	idx = strings.LastIndexByte(ec.File[:idx], '/')
-	if idx == -1 {
-		return ec.FullPath()
-	}
-	buf := bufferpool.Get()
-	// Keep everything after the penultimate separator.
-	buf.AppendString(ec.File[idx+1:])
-	buf.AppendByte(':')
-	buf.AppendInt(int64(ec.Line))
-	caller := buf.String()
-	buf.Free()
-	return caller
 }
 
 // An Entry represents a complete log message. The entry's structured context

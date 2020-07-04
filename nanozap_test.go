@@ -22,7 +22,6 @@ package nanozap
 
 import (
 	"io/ioutil"
-	"os"
 	"testing"
 	"time"
 
@@ -92,9 +91,9 @@ func defaultEncoderConf() zapcore.EncoderConfig {
 	}
 }
 
-func Benchmark10Fields(b *testing.B) {
+func BenchmarkLogger_Info_Parallel(b *testing.B) {
 	withBenchedLogger(b, func(log *Logger) {
-		log.Info("Ten fields, passed at the log site.")
+		log.Info("", "Ten fields, passed at the log site.")
 
 	})
 }
@@ -112,37 +111,25 @@ func BenchmarkLogger_Info(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		logger.Info("logger_info")
+		logger.Info("", "logger_info")
 	}
 }
 
-func TestLogger_Info(t *testing.T) {
-	logger := New(
-		zapcore.NewCore(
-			zapcore.NewJSONEncoder(defaultEncoderConf()),
-			os.Stdout,
-			DebugLevel,
-		))
-	//defer logger.Close()
-
-	logger.Info("logger_info")
-
-}
-
 // check no goroutine leak
-func TestRotation_Close(t *testing.T) {
+func TestLogger_Close(t *testing.T) {
 
 	defer goleak.VerifyNone(t)
 
-	logger := New(
-		zapcore.NewCore(
-			zapcore.NewJSONEncoder(defaultEncoderConf()),
-			os.Stdout,
-			DebugLevel,
-		))
+	core := zapcore.NewCore(
+		zapcore.NewJSONEncoder(defaultEncoderConf()),
+		&Discarder{},
+		DebugLevel,
+	)
 
-	logger.Info("logger_info")
+	logger := New(core)
 
+	logger.Info("reqid", "logger_info")
 	time.Sleep(2 * time.Millisecond)
+
 	logger.Close()
 }
