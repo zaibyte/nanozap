@@ -23,7 +23,6 @@ package nanozap
 
 import (
 	"context"
-	"strings"
 	"sync"
 	"time"
 	"unsafe"
@@ -56,7 +55,7 @@ type Logger struct {
 // more convenient.
 //
 // For sample code, see the package-level AdvancedConfiguration example.
-func New(core zapcore.Core, options ...Option) *Logger {
+func New(core zapcore.Core) *Logger {
 	if core == nil {
 		return nil
 	}
@@ -64,7 +63,7 @@ func New(core zapcore.Core, options ...Option) *Logger {
 		core: core,
 		ring: newRandRing(12),
 	}
-	log = log.WithOptions(options...)
+
 	log.startLoop()
 	return log
 }
@@ -73,42 +72,6 @@ func New(core zapcore.Core, options ...Option) *Logger {
 // Without guarantee anything except exiting loop.
 func (log *Logger) Close() {
 	log.stopLoop()
-}
-
-// Named adds a new path segment to the logger's name. Segments are joined by
-// periods. By default, Loggers are unnamed.
-func (log *Logger) Named(s string) *Logger {
-	if s == "" {
-		return log
-	}
-	l := log.clone()
-	if log.name == "" {
-		l.name = s
-	} else {
-		l.name = strings.Join([]string{l.name, s}, ".")
-	}
-	return l
-}
-
-// WithOptions clones the current Logger, applies the supplied Options, and
-// returns the resulting Logger. It's safe to use concurrently.
-func (log *Logger) WithOptions(opts ...Option) *Logger {
-	c := log.clone()
-	for _, opt := range opts {
-		opt.apply(c)
-	}
-	return c
-}
-
-// With creates a child logger and adds structured context to it. Fields added
-// to the child don't affect the parent, and vice versa.
-func (log *Logger) With(fields ...Field) *Logger {
-	if len(fields) == 0 {
-		return log
-	}
-	l := log.clone()
-	l.core = l.core.With(fields)
-	return l
 }
 
 // Check returns a CheckedEntry if logging a message at the specified level
@@ -234,11 +197,6 @@ func (log *Logger) Sync() error {
 // Core returns the Logger's underlying zapcore.Core.
 func (log *Logger) Core() zapcore.Core {
 	return log.core
-}
-
-func (log *Logger) clone() *Logger {
-	copy := *log
-	return &copy
 }
 
 func (log *Logger) check(lvl zapcore.Level, msg string) *zapcore.CheckedEntry {
