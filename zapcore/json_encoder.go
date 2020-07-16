@@ -28,8 +28,8 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/templexxx/nanozap/buffer"
-	"github.com/templexxx/nanozap/internal/bufferpool"
+	"github.com/zaibyte/nanozap/buffer"
+	"github.com/zaibyte/nanozap/internal/bufferpool"
 )
 
 // For JSON-escaping; see jsonEncoder.safeAddString below.
@@ -322,7 +322,6 @@ func (enc *jsonEncoder) EncodeEntry(ent Entry, fields []Field) (*buffer.Buffer, 
 	if final.TimeKey != "" {
 		final.AddTime(final.TimeKey, ent.Time)
 	}
-
 
 	if final.MessageKey != "" {
 		final.addKey(enc.MessageKey)

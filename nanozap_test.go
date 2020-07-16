@@ -27,7 +27,7 @@ import (
 
 	"go.uber.org/goleak"
 
-	"github.com/templexxx/nanozap/zapcore"
+	"github.com/zaibyte/nanozap/zapcore"
 )
 
 func withBenchedLogger(b *testing.B, f func(*Logger)) {

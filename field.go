@@ -25,7 +25,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/templexxx/nanozap/zapcore"
+	"github.com/zaibyte/nanozap/zapcore"
 )
 
 // Field is an alias for Field. Aliasing this type dramatically

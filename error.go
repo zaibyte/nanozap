@@ -23,7 +23,7 @@ package nanozap
 import (
 	"sync"
 
-	"github.com/templexxx/nanozap/zapcore"
+	"github.com/zaibyte/nanozap/zapcore"
 )
 
 var _errArrayElemPool = sync.Pool{New: func() interface{} {

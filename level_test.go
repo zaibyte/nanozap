@@ -24,7 +24,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/templexxx/nanozap/zapcore"
+	"github.com/zaibyte/nanozap/zapcore"
 
 	"github.com/stretchr/testify/assert"
 )

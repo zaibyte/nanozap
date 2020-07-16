@@ -23,7 +23,7 @@ package zapcore
 import (
 	"time"
 
-	"github.com/templexxx/nanozap/buffer"
+	"github.com/zaibyte/nanozap/buffer"
 )
 
 // DefaultLineEnding defines the default line ending when writing logs.

@@ -21,7 +21,7 @@
 package nanozap
 
 import (
-	"github.com/templexxx/nanozap/zapcore"
+	"github.com/zaibyte/nanozap/zapcore"
 	"go.uber.org/atomic"
 )
 

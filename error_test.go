@@ -24,7 +24,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/templexxx/nanozap/zapcore"
+	"github.com/zaibyte/nanozap/zapcore"
 
 	richErrors "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"

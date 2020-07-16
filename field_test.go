@@ -26,7 +26,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/templexxx/nanozap/zapcore"
+	"github.com/zaibyte/nanozap/zapcore"
 )
 
 type username string

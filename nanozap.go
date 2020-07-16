@@ -28,8 +28,8 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/templexxx/nanozap/zapcore"
 	"github.com/templexxx/tsc"
+	"github.com/zaibyte/nanozap/zapcore"
 )
 
 // For nanozap, the random order only happens when there is a flood,

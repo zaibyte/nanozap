@@ -23,7 +23,7 @@ package nanozap
 import (
 	"time"
 
-	"github.com/templexxx/nanozap/zapcore"
+	"github.com/zaibyte/nanozap/zapcore"
 )
 
 // Array constructs a field with the given key and ArrayMarshaler. It provides

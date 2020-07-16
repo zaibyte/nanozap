@@ -23,7 +23,7 @@ package nanozap
 import (
 	"sync"
 
-	"github.com/templexxx/nanozap/zapcore"
+	"github.com/zaibyte/nanozap/zapcore"
 )
 
 var (
@@ -32,10 +32,10 @@ var (
 )
 
 type logBody struct {
-	lvl  zapcore.Level
-	msg  string
+	lvl   zapcore.Level
+	msg   string
 	reqid string
-	pool logBodyPool
+	pool  logBodyPool
 }
 
 func (b *logBody) free() {
@@ -56,8 +56,8 @@ func newLogBodyPool() logBodyPool {
 	return logBodyPool{p: &sync.Pool{
 		New: func() interface{} {
 			return &logBody{
-				lvl: InfoLevel,
-				msg: "",
+				lvl:   InfoLevel,
+				msg:   "",
 				reqid: "",
 			}
 		},

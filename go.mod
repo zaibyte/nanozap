@@ -1,4 +1,4 @@
-module github.com/templexxx/nanozap
+module github.com/zaibyte/nanozap
 
 go 1.14
 
