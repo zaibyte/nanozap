@@ -329,7 +329,7 @@ func (enc *jsonEncoder) EncodeEntry(ent Entry, fields []Field) (*buffer.Buffer, 
 	}
 
 	if final.ReqIDKey != "" {
-		final.AddString(enc.ReqIDKey, ent.ReqID)
+		final.AddUint64(enc.ReqIDKey, ent.ReqID)
 	}
 
 	if enc.buf.Len() > 0 {

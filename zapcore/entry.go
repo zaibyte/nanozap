@@ -56,10 +56,10 @@ func putCheckedEntry(ce *CheckedEntry) {
 // Entries are pooled, so any functions that accept them MUST be careful not to
 // retain references to them.
 type Entry struct {
-	Level      Level
-	Time       int64
-	Message    string
-	ReqID      string
+	Level   Level
+	Time    int64
+	Message string
+	ReqID   uint64
 }
 
 // CheckWriteAction indicates what action to take after a log entry is
@@ -84,9 +84,9 @@ const (
 // NOT be retained after calling their Write method.
 type CheckedEntry struct {
 	Entry
-	dirty       bool // best-effort detection of pool misuse
-	should      CheckWriteAction
-	cores       []Core
+	dirty  bool // best-effort detection of pool misuse
+	should CheckWriteAction
+	cores  []Core
 }
 
 func (ce *CheckedEntry) reset() {

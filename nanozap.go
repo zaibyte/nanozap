@@ -103,7 +103,7 @@ func (log *Logger) writeLoop() {
 }
 
 // Debug logs a message at DebugLevel.
-func (log *Logger) Debug(reqid, msg string) {
+func (log *Logger) Debug(reqid uint64, msg string) {
 	// Fast check. Debug level is a special case, because we usually use it in developing,
 	// then close it in production env. There maybe lots of Enabled test, return it early.
 	if !log.core.Enabled(DebugLevel) {
@@ -118,7 +118,7 @@ func (log *Logger) Debug(reqid, msg string) {
 	log.ring.Push(unsafe.Pointer(lb))
 }
 
-func (log *Logger) Debugf(reqid, format string, args ...interface{}) {
+func (log *Logger) Debugf(reqid uint64, format string, args ...interface{}) {
 	// Fast check. Debug level is a special case, because we usually use it in developing,
 	// then close it in production env. There maybe lots of Enabled test, return it early.
 	if !log.core.Enabled(DebugLevel) {
@@ -134,7 +134,7 @@ func (log *Logger) Debugf(reqid, format string, args ...interface{}) {
 }
 
 // Info logs a message at InfoLevel.
-func (log *Logger) Info(reqid, msg string) {
+func (log *Logger) Info(reqid uint64, msg string) {
 
 	lb := getLogBody()
 	lb.msg = msg
@@ -144,13 +144,13 @@ func (log *Logger) Info(reqid, msg string) {
 	log.ring.Push(unsafe.Pointer(lb))
 }
 
-func (log *Logger) Infof(reqid, format string, args ...interface{}) {
+func (log *Logger) Infof(reqid uint64, format string, args ...interface{}) {
 
 	log.Info(reqid, fmt.Sprintf(format, args...))
 }
 
 // Warn logs a message at WarnLevel.
-func (log *Logger) Warn(reqid, msg string) {
+func (log *Logger) Warn(reqid uint64, msg string) {
 	lb := getLogBody()
 	lb.msg = msg
 	lb.lvl = WarnLevel
@@ -159,13 +159,13 @@ func (log *Logger) Warn(reqid, msg string) {
 	log.ring.Push(unsafe.Pointer(lb))
 }
 
-func (log *Logger) Warnf(reqid, format string, args ...interface{}) {
+func (log *Logger) Warnf(reqid uint64, format string, args ...interface{}) {
 
 	log.Warn(reqid, fmt.Sprintf(format, args...))
 }
 
 // Error logs a message at ErrorLevel.
-func (log *Logger) Error(reqid, msg string) {
+func (log *Logger) Error(reqid uint64, msg string) {
 	lb := getLogBody()
 	lb.msg = msg
 	lb.lvl = ErrorLevel
@@ -174,7 +174,7 @@ func (log *Logger) Error(reqid, msg string) {
 	log.ring.Push(unsafe.Pointer(lb))
 }
 
-func (log *Logger) Errorf(reqid, format string, args ...interface{}) {
+func (log *Logger) Errorf(reqid uint64, format string, args ...interface{}) {
 
 	log.Error(reqid, fmt.Sprintf(format, args...))
 }
@@ -182,7 +182,7 @@ func (log *Logger) Errorf(reqid, format string, args ...interface{}) {
 // Panic logs a message at PanicLevel. T
 //
 // The logger then panics, even if logging at PanicLevel is disabled.
-func (log *Logger) Panic(reqid, msg string) {
+func (log *Logger) Panic(reqid uint64, msg string) {
 	lb := getLogBody()
 	lb.msg = msg
 	lb.lvl = PanicLevel
@@ -191,7 +191,7 @@ func (log *Logger) Panic(reqid, msg string) {
 	log.ring.Push(unsafe.Pointer(lb))
 }
 
-func (log *Logger) Panicf(reqid, format string, args ...interface{}) {
+func (log *Logger) Panicf(reqid uint64, format string, args ...interface{}) {
 
 	log.Panic(reqid, fmt.Sprintf(format, args...))
 }
@@ -200,7 +200,7 @@ func (log *Logger) Panicf(reqid, format string, args ...interface{}) {
 //
 // The logger then calls os.Exit(1), even if logging at FatalLevel is
 // disabled.
-func (log *Logger) Fatal(reqid, msg string) {
+func (log *Logger) Fatal(reqid uint64, msg string) {
 	lb := getLogBody()
 	lb.msg = msg
 	lb.lvl = FatalLevel
@@ -209,7 +209,7 @@ func (log *Logger) Fatal(reqid, msg string) {
 	log.ring.Push(unsafe.Pointer(lb))
 }
 
-func (log *Logger) Fatalf(reqid, format string, args ...interface{}) {
+func (log *Logger) Fatalf(reqid uint64, format string, args ...interface{}) {
 
 	log.Fatal(reqid, fmt.Sprintf(format, args...))
 }
@@ -225,7 +225,7 @@ func (log *Logger) Core() zapcore.Core {
 	return log.core
 }
 
-func (log *Logger) check(lvl zapcore.Level, msg, reqid string) *zapcore.CheckedEntry {
+func (log *Logger) check(lvl zapcore.Level, msg string, reqid uint64) *zapcore.CheckedEntry {
 
 	// Create basic checked entry thru the core; this will be non-nil if the
 	// log message will actually be written somewhere.

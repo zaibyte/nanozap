@@ -34,7 +34,7 @@ var (
 type logBody struct {
 	lvl   zapcore.Level
 	msg   string
-	reqid string
+	reqid uint64
 	pool  logBodyPool
 }
 
@@ -45,7 +45,7 @@ func (b *logBody) free() {
 func (b *logBody) reset() {
 	b.lvl = InfoLevel
 	b.msg = ""
-	b.reqid = ""
+	b.reqid = 0
 }
 
 type logBodyPool struct {
@@ -58,7 +58,7 @@ func newLogBodyPool() logBodyPool {
 			return &logBody{
 				lvl:   InfoLevel,
 				msg:   "",
-				reqid: "",
+				reqid: 0,
 			}
 		},
 	}}
