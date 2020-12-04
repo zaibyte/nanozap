@@ -6,7 +6,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.6.1
 	github.com/templexxx/cpu v0.0.8-0.20200904080713-862a179c181c
-	github.com/templexxx/fnc v1.0.0
+	github.com/templexxx/fnc v1.0.1
 	github.com/templexxx/tsc v0.0.2-0.20201016082558-86c1143c3415
 	go.uber.org/atomic v1.6.0
 	go.uber.org/goleak v1.0.0
