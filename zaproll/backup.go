@@ -11,7 +11,6 @@ package zaproll
 import (
 	"container/heap"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -72,7 +71,15 @@ func listBackups(outputPath string, max int) (*Backups, error) {
 func (b *Backups) list(outputPath string, max int) error {
 
 	dir := filepath.Dir(outputPath)
-	ns, err := ioutil.ReadDir(dir)
+
+	// Ensure we have this directory.
+	// If already has, do nothing.
+	err := os.MkdirAll(dir, 0755)
+	if err != nil {
+		return err
+	}
+
+	ns, err := os.ReadDir(dir)
 	if err != nil {
 		return err // Path error
 	}
