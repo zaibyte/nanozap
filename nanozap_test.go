@@ -22,6 +22,7 @@ package nanozap
 
 import (
 	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
@@ -77,6 +78,14 @@ func (d *Discarder) Write(b []byte) (int, error) {
 	return ioutil.Discard.Write(b)
 }
 
+type Stdouter struct {
+	Syncer
+}
+
+func (s *Stdouter) Write(b []byte) (int, error) {
+	return os.Stdout.Write(b)
+}
+
 // default without caller and stack trace,
 func defaultEncoderConf() zapcore.EncoderConfig {
 	return zapcore.EncoderConfig{
@@ -122,12 +131,17 @@ func TestLogger_Close(t *testing.T) {
 
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(defaultEncoderConf()),
-		&Discarder{},
+		&Stdouter{},
 		DebugLevel,
 	)
 
 	logger := New(core)
 
+	logger.Info(0, "logger_info")
+	logger.Info(0, "logger_info")
+	logger.Info(0, "logger_info")
+	logger.Info(0, "logger_info")
+	logger.Info(0, "logger_info")
 	logger.Info(0, "logger_info")
 	time.Sleep(2 * time.Millisecond)
 
