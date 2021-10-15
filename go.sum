@@ -46,8 +46,8 @@ github.com/templexxx/cpu v0.0.8-0.20200904080713-862a179c181c h1:tFh7zwJTaRrmq6x
 github.com/templexxx/cpu v0.0.8-0.20200904080713-862a179c181c/go.mod h1:w7Tb+7qgcAlIyX4NhLuDKt78AHA5SzPmq0Wj6HiEnnk=
 github.com/templexxx/fnc v1.0.1 h1:abLjCYPKEyN+nmJjtxQtcuEdtJGWCSqnXFvhrIrX6To=
 github.com/templexxx/fnc v1.0.1/go.mod h1:b66A7maDNEAAJOqWNGMJZvlp1VXqWAeeSpFfdeenMHo=
-github.com/templexxx/tsc v1.0.1 h1:1WR0SrqMnYzvmEKTHPdfEQg6cjWySEoexMi6awZloMs=
-github.com/templexxx/tsc v1.0.1/go.mod h1:/nsBSTewAjTHdW10ELwUN/xzz4Rpta67MGKoaINId58=
+github.com/templexxx/tsc v1.1.1 h1:CS/CIJgZ327wzTu9N69Zle6ZItfhFpWKL7CL9GH1AKA=
+github.com/templexxx/tsc v1.1.1/go.mod h1:/nsBSTewAjTHdW10ELwUN/xzz4Rpta67MGKoaINId58=
 go.uber.org/atomic v1.6.0 h1:Ezj3JGmsOnG1MoRWQkPBsKLe9DwWD9QeXzTRzzldNVk=
 go.uber.org/atomic v1.6.0/go.mod h1:sABNBOSYdrvTF6hTgEIbc7YasKWGhgEQZyfxyTvoXHQ=
 go.uber.org/goleak v1.0.0 h1:qsup4IcBdlmsnGfqyLl4Ntn3C2XCCuKAE7DwHpScyUo=
